@@ -29,30 +29,31 @@ class UserData(commands.Cog):
     #initialize bot
     @commands.Cog.listener()
     async def on_ready(self):
-        await self.client.change_presence(activity=discord.Game("Testing bot! Online for testing!"))
+        await self.client.change_presence(activity=discord.Game("Online for testing!"))
         print('IFA Bot is operational!')
 
-
+    #Test command for ingesting user data
     @commands.command()
-    async def test_users(self, ctx, discordIDarr,usernamesArr,rolesArr,dateJoinedArr):
+    async def test_users(self, ctx):
         for u in ctx.guild.members: #gets users in the guild
-            usernamesArr.append([u.name]) #gets username
-            discordIDarr.append([u.id]) #gets discord id
-            dateJoinedArr.append([u.joined_at.strftime('%d-%m-%Y')]) #gets datetime of when user joined
+            self.usernamesArr.append([u.name]) #gets username
+            self.discordIDarr.append([u.id]) #gets discord id
+            self.dateJoinedArr.append([u.joined_at.strftime('%d-%m-%Y')]) #gets datetime of when user joined
             for r in ctx.guild.roles: #gets the roles of users
                 if r in u.roles and r.name != '@everyone':
-                    rolesArr.append([r.name])
-        await ctx.send(f'TEST COMMAND:\nUSERS:{usernamesArr}\nID:{discordIDarr}\nJOINED:{dateJoinedArr}\nROLES:{rolesArr}\n')
+                    self.rolesArr.append([r.name])
+        await ctx.send(f'TEST COMMAND:\nUSERS:{self.usernamesArr}\nID:{self.discordIDarr}\nJOINED:{self.dateJoinedArr}\nROLES:{self.rolesArr}\n')
 
+    #Scheduled event for ingesting data and sending to the sql database.
     @tasks.loop(time=looptime)
-    async def ingest_data(self, ctx, discordIDarr,usernamesArr,rolesArr,dateJoinedArr):
+    async def ingest_data(self, ctx):
         for u in ctx.guild.members: #gets users in the guild
-            usernamesArr.append([u.name]) #gets username
-            discordIDarr.append([u.id]) #gets discord id
-            dateJoinedArr.append([u.joined_at.strftime('%d-%m-%Y')]) #gets datetime of when user joined
+            self.usernamesArr.append([u.name]) #gets username
+            self.discordIDarr.append([u.id]) #gets discord id
+            self.dateJoinedArr.append([u.joined_at.strftime('%d-%m-%Y')]) #gets datetime of when user joined
         for r in ctx.guild.roles: #gets the roles of users
             if r in u.roles and r.name != '@everyone':
-                rolesArr.append([r.name])
+                self.rolesArr.append([r.name])
     
     def organize_data(self, discordIDarr,usernamesArr,rolesArr,dateJoinedArr):
         pass
