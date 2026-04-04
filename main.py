@@ -29,7 +29,9 @@ get users information, such as name, id, and roles.
 '''
 
 #test arrays
-usersArr = []
+discordIDarr = []
+usernamesArr = []
+dateJoinedArr = []
 rolesArr = []
 
 #arrays that are used to categorize roles:
@@ -45,22 +47,24 @@ misc = []
 @client.command()
 async def test_users_and_roles(ctx):
         for n in ctx.guild.members:
-             usersArr.append(n.name)
+             usernamesArr.append(n.name)
         for r in ctx.guild.roles:
              if r.name == '@everyone':
                   pass
              else:
                 rolesArr.append(r.name)
-        await ctx.send(f'TEST COMMAND:\n{usersArr}\n{rolesArr}')
+        await ctx.send(f'TEST COMMAND:\n{usernamesArr}\n{rolesArr}')
         
 @client.command()
 async def test_users(ctx):
-    for u in ctx.guild.members:
-        usersArr.append([u.name])
-        for r in ctx.guild.roles:
+    for u in ctx.guild.members: #gets users in the guild
+        usernamesArr.append([u.name]) #gets username
+        discordIDarr.append([u.id]) #gets discord id
+        dateJoinedArr.append([u.joined_at.strftime('%d-%m-%Y')]) #gets datetime of when user joined
+        for r in ctx.guild.roles: #gets the roles of users
             if r in u.roles and r.name != '@everyone':
                 rolesArr.append([r.name])
-    await ctx.send(f'TEST COMMAND:\n{usersArr}\n{rolesArr}\n')
+    await ctx.send(f'TEST COMMAND:\nUSERS:{usernamesArr}\nID:{discordIDarr}\nJOINED:{dateJoinedArr}\nROLES:{rolesArr}\n')
 
 if __name__ == "__main__":
     client.run(token)
