@@ -10,6 +10,8 @@ from discord.ext import commands
 #get token
 load_dotenv()
 intents = discord.Intents.default()
+intents.members = True
+
 
 #intents section
 intents.message_content = True
@@ -22,47 +24,43 @@ token = os.getenv('TOKEN')
 async def on_ready():
     print("Logged in as a bot {0.user}".format(client))
 
-@client.event
-async def on_message(message):
-    username = str(message.author).split("#")[0]
-    channel = str(message.channel.name)
-    user_message = str(message.content)
+'''
+get users information, such as name, id, and roles.
+'''
 
-    print(f'Message {user_message} by {username} on {channel} at {datetime.now()}')
+#test arrays
+usersArr = []
+rolesArr = []
 
-    if message.author == client.user:
-        return
-
-    if channel == "output":
-        if user_message.lower() == "help" or user_message.lower() == "hi":
-            await message.channel.send(f'Hello {username}. Here are my current commands!\n ?roleget, ?ping, ?announcement...')
-            return
-        elif user_message.lower() == "67":
-            await message.channel.send(f'Get help, {username}')
-    await client.process_commands(message) #tells bot to check for defined command
-
-#discord commands
+#arrays that are used to categorize roles:
+admin = ['Inquisitor','Lexmechanicus (mod team)','Enforcer Primaris','Leadership','Enforcer']
+leadership = ['Mission Department Lead','Interrogator','Enforcer Primaris','Inquisitor','Leadership','Team Leader','Tech priest']
+detachment = ['Defiance (Armor)','Vengeance (Air)','Harlequin (Actor)', 'Medicae', 'Zeal squad', 'Redemption Squad']
+rank = ['Team Leader', 'Squad Leader', 'Trooper', 'Scion', 'Schola', 'Scion', 'Acolyte', 'Agent','Reserves']
+department = ['Zeus', 'Archivist','Eden','Enginseer','Harlequin (Actor)']
+qualifications = ['BCT','Heavy Weapon: AP','Heavy Weapons: AT', 'Marksmen','Grenadier','Demo','Medical','Vox','Test-Taker']
+misc = []
+#ignored = ['\\\ Other Duties and Titles >>>','<<< Other Game Interests ///', '///Quals>>>', 'new role', '<<< Rank & Detachment ///','Reaction Roles']
 
 @client.command()
-async def ping(ctx):
-    if str(ctx.channel.name) == "output":
-        await ctx.send('Wanker')
-    else:
-        await ctx.send('Pong lol!')
-
+async def test_users_and_roles(ctx):
+        for n in ctx.guild.members:
+             usersArr.append(n.name)
+        for r in ctx.guild.roles:
+             if r.name == '@everyone':
+                  pass
+             else:
+                rolesArr.append(r.name)
+        await ctx.send(f'TEST COMMAND:\n{usersArr}\n{rolesArr}')
+        
 @client.command()
-async def roleget(ctx, member: discord.Member):
-    roles = member.roles #get roles of member
-    role_names = [role.name for role in roles if role.name != "@everyone"] #extract role names
-    await ctx.send(f"{member.name}'s roles: {','.join(role_names)}")
-
-
-@client.command()
-async def announcement(ctx, message):
-    user_message = str(message.content)
-    await ctx.send('THIS IS A TEST\n')
-    await ctx.send(f'[ANNOUNCEMENT]:\n{user_message}')
-    
+async def test_users(ctx):
+    for u in ctx.guild.members:
+        usersArr.append([u.name])
+        for r in ctx.guild.roles:
+            if r in u.roles and r.name != '@everyone':
+                rolesArr.append([r.name])
+    await ctx.send(f'TEST COMMAND:\n{usersArr}\n{rolesArr}\n')
 
 if __name__ == "__main__":
     client.run(token)
