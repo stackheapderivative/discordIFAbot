@@ -15,6 +15,16 @@ misc = []
 ignored = ['\\\\\\ Other Duties and Titles >>>','<<< Other Game Interests ///', '///Quals>>>', 'new role', '<<< Rank & Detachment ///','Reaction Roles']
 
 
+#NOTE: DUMMY ARRAYS
+test_admin = ['Not inquisitor', 'Blundership']
+test_leadership = ['Blundership']
+test_detachment = ['Zeal?!??!']
+test_rank = ['Schola','Silly']
+test_department = ['Zeusy','Edener']
+test_qualifications = ['BCT','Demo','Medical','Vox']
+test_misc = []
+test_ignored = ['<<< Rank & Detachment ///','<<< Other Game Interests ///','\\\\\\ Other Duties and Titles >>>','///Quals >>>','John The Servitor']
+
 class UserData(commands.Cog):
     def __init__(self, client):
         self.client = client
