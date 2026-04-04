@@ -28,7 +28,7 @@ async def on_ready():
 get users information, such as name, id, and roles.
 '''
 
-#test arrays
+#organization arrays
 discordIDarr = []
 usernamesArr = []
 dateJoinedArr = []
@@ -42,19 +42,9 @@ rank = ['Team Leader', 'Squad Leader', 'Trooper', 'Scion', 'Schola', 'Scion', 'A
 department = ['Zeus', 'Archivist','Eden','Enginseer','Harlequin (Actor)']
 qualifications = ['BCT','Heavy Weapon: AP','Heavy Weapons: AT', 'Marksmen','Grenadier','Demo','Medical','Vox','Test-Taker']
 misc = []
-#ignored = ['\\\ Other Duties and Titles >>>','<<< Other Game Interests ///', '///Quals>>>', 'new role', '<<< Rank & Detachment ///','Reaction Roles']
+ignored = ['\\\\\\ Other Duties and Titles >>>','<<< Other Game Interests ///', '///Quals>>>', 'new role', '<<< Rank & Detachment ///','Reaction Roles']
 
-@client.command()
-async def test_users_and_roles(ctx):
-        for n in ctx.guild.members:
-             usernamesArr.append(n.name)
-        for r in ctx.guild.roles:
-             if r.name == '@everyone':
-                  pass
-             else:
-                rolesArr.append(r.name)
-        await ctx.send(f'TEST COMMAND:\n{usernamesArr}\n{rolesArr}')
-        
+       
 @client.command()
 async def test_users(ctx):
     for u in ctx.guild.members: #gets users in the guild
