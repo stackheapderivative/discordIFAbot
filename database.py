@@ -1,5 +1,6 @@
 import pymysql
 
+#FIXME: CONVERT TO SQLITE3
 
 #create db/check if it exists
 def db_operation_run():
@@ -9,7 +10,7 @@ def db_operation_run():
         host="localhost",
         user="temp",
         password="temp123"
-    )
+    ) 
     cur = conn.cursor()
     cur.execute("create database if not exists DISCORD_IFA;") #creates if db not made
     cur.execute("USE DISCORD_IFA;")
