@@ -25,6 +25,9 @@ test_qualifications = ['BCT','Demo','Medical','Vox']
 test_misc = []
 test_ignored = ['<<< Rank & Detachment ///','<<< Other Game Interests ///','\\\\\\ Other Duties and Titles >>>','///Quals >>>','John The Servitor']
 
+#dictionaries for data organization
+Users = {}
+Roles = {}
 class UserData(commands.Cog):
     def __init__(self, client):
         self.client = client
@@ -33,6 +36,7 @@ class UserData(commands.Cog):
         self.usernamesArr = []
         self.dateJoinedArr = []
         self.rolesArr = []
+        self.temp_rolesArr = []
         #date of today
         
 
@@ -51,8 +55,14 @@ class UserData(commands.Cog):
             self.dateJoinedArr.append([u.joined_at.strftime('%d-%m-%Y')]) #gets datetime of when user joined
             for r in ctx.guild.roles: #gets the roles of users
                 if r in u.roles and r.name != '@everyone':
-                    self.rolesArr.append([r.name])
-        await ctx.send(f'TEST COMMAND:\nUSERS:{self.usernamesArr}\nID:{self.discordIDarr}\nJOINED:{self.dateJoinedArr}\nROLES:{self.rolesArr}\n')
+                    self.temp_rolesArr.append([r.name]) #temp is used to store temporarily for one user, store as list in roles.
+            self.rolesArr.append([self.temp_rolesArr])
+        # await ctx.send(f'TEST COMMAND:\nUSERS:{self.usernamesArr}\nID:{self.discordIDarr}\nJOINED:{self.dateJoinedArr}\nROLES:{self.rolesArr}\n')
+        #FIXME: TEST
+        # testobj = list(zip(self.usernamesArr, self.rolesArr))
+        # for i in testobj:
+        #     await ctx.send(f'TEST: {i}')
+        self.organize_data()
 
     #Scheduled event for ingesting data and sending to the sql database.
     @tasks.loop(time=looptime)
@@ -61,12 +71,45 @@ class UserData(commands.Cog):
             self.usernamesArr.append([u.name]) #gets username
             self.discordIDarr.append([u.id]) #gets discord id
             self.dateJoinedArr.append([u.joined_at.strftime('%d-%m-%Y')]) #gets datetime of when user joined
-        for r in ctx.guild.roles: #gets the roles of users
-            if r in u.roles and r.name != '@everyone':
-                self.rolesArr.append([r.name])
+            for r in ctx.guild.roles: #gets the roles of users
+                if r in u.roles and r.name != '@everyone':
+                    self.temp_rolesArr.append([r.name])
+            self.rolesArr.append([self.temp_rolesArr])
     
-    def organize_data(self, discordIDarr,usernamesArr,rolesArr,dateJoinedArr):
-        pass
+    '''
+DATA FORMATTING:
+FOR USERS TABLE SEND: discord_id, username, date_joined.
+FOR ROLES TABLE: send role name, role type.
+FOR USERROLES TABLE: link roles
+'''
+    def organize_data(self):
+        #loop for user information
+        user_information = zip(self.usernamesArr, self.discordIDarr, self.dateJoinedArr, self.rolesArr)
+        for i in user_information:
+            Users.update({i[0][0]:{'name':i[0][0],'disc_id':i[1][0],'date':i[2][0], 'roles':i[3][0]}})
+        #FIXME: TEST USERS
+        print(Users)
+        for l in self.temp_rolesArr:
+            for i in l:
+                if i in test_admin:
+                    Roles.update({i:{'role_name':i,'type':0}})
+                elif i in test_leadership:
+                    Roles.update({i:{'role_name':i,'type':1}})
+                elif i in test_detachment:
+                    Roles.update({i:{'role_name':i,'type':2}})
+                elif i in test_rank:
+                    Roles.update({i:{'role_name':i,'type':3}})
+                elif i in test_department:
+                    Roles.update({i:{'role_name':i,'type':4}})
+                elif i in test_qualifications:
+                    Roles.update({i:{'role_name':i,'type':5}})
+                elif i in test_ignored:
+                    continue
+                else:
+                    Roles.update({i:{'role_name':i,'type':6}})
+        #FIXME: TEST ROLES
+        print(Roles)
+
 
 
 async def setup(client):
