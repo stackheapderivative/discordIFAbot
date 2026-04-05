@@ -1,7 +1,5 @@
 import discord
 import os
-import random
-import db
 from dotenv import load_dotenv
 from discord.ext import commands, tasks
 from cogs.UserData import UserData #cog for handling user data

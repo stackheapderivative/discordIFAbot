@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands, tasks
 from datetime import datetime, time
-
+import db
 looptime = time(hour=0, minute=0) #lets us run the data ingestion every 24 hours.
 
 #arrays that are used to categorize roles:
@@ -16,7 +16,7 @@ ignored = ['\\\\\\ Other Duties and Titles >>>','<<< Other Game Interests ///', 
 
 
 #NOTE: DUMMY ARRAYS
-test_admin = ['Not inquisitor', 'Blundership']
+test_admin = ['Not inquisitor']
 test_leadership = ['Blundership']
 test_detachment = ['Zeal?!??!']
 test_rank = ['Schola','Silly']
@@ -54,7 +54,7 @@ class UserData(commands.Cog):
             self.discordIDarr.append([u.id]) #gets discord id
             self.dateJoinedArr.append([u.joined_at.strftime('%d-%m-%Y')]) #gets datetime of when user joined
             for r in ctx.guild.roles: #gets the roles of users
-                if r in u.roles and r.name != '@everyone':
+                if r in u.roles and r.name != '@everyone' and r.name not in test_ignored:
                     self.temp_rolesArr.append([r.name]) #temp is used to store temporarily for one user, store as list in roles.
             self.rolesArr.append([self.temp_rolesArr])
         # await ctx.send(f'TEST COMMAND:\nUSERS:{self.usernamesArr}\nID:{self.discordIDarr}\nJOINED:{self.dateJoinedArr}\nROLES:{self.rolesArr}\n')
@@ -72,16 +72,10 @@ class UserData(commands.Cog):
             self.discordIDarr.append([u.id]) #gets discord id
             self.dateJoinedArr.append([u.joined_at.strftime('%d-%m-%Y')]) #gets datetime of when user joined
             for r in ctx.guild.roles: #gets the roles of users
-                if r in u.roles and r.name != '@everyone':
+                if r in u.roles and r.name != '@everyone' and r.name not in test_ignored:
                     self.temp_rolesArr.append([r.name])
             self.rolesArr.append([self.temp_rolesArr])
     
-    '''
-DATA FORMATTING:
-FOR USERS TABLE SEND: discord_id, username, date_joined.
-FOR ROLES TABLE: send role name, role type.
-FOR USERROLES TABLE: link roles
-'''
     def organize_data(self):
         #loop for user information
         user_information = zip(self.usernamesArr, self.discordIDarr, self.dateJoinedArr, self.rolesArr)
@@ -103,12 +97,16 @@ FOR USERROLES TABLE: link roles
                     Roles.update({i:{'role_name':i,'type':4}})
                 elif i in test_qualifications:
                     Roles.update({i:{'role_name':i,'type':5}})
-                elif i in test_ignored:
-                    continue
                 else:
                     Roles.update({i:{'role_name':i,'type':6}})
         #FIXME: TEST ROLES
         print(Roles)
+        db.populate(Users,Roles) #sends data to sqlite3
+
+
+
+
+
 
 
 
