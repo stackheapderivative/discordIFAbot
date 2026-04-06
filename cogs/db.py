@@ -36,8 +36,8 @@ def operate_db():
                 role_id int AUTO_INCREMENT,
                 role_name VARCHAR(100) NOT NULL,
                 PRIMARY KEY(user_id, role_id),
-                FOREIGN KEY(user_id) references Users(user_id),
-                FOREIGN KEY (role_id references Roles(role_id)
+                FOREIGN KEY (user_id) references Users(user_id),
+                FOREIGN KEY (role_id) references Roles(role_id)
                 )''')
     
 
@@ -46,18 +46,25 @@ def operate_db():
     con.close()
 
 def populate(u, r):
+    role_dict = {}
     con = sqlite3.connect('IFA.db')
     cur = con.cursor()
-    for i in r:
-        cur.execute('INSERT INTO Roles (role_name, role_type) VALUES (?,?)', i['role_name'],i['type'])
+    for m in r: #accesses for roles FIXME: MAKE THIS ITERATE ROLES.VALUES()
+        cur.execute('INSERT INTO Roles (role_name, role_type) VALUES (?,?)', m['role_name'],m['type'])
+        role_id = cur.lastrowid
+        role_dict.update({m['role_name']: role_id})
     for i in u:
-        #accessed the first part of the dict
+        #accessed the first part of the dict of Users
         cur.execute('INSERT INTO Users (discord_id, username, date_joined) VALUES (?, ?, ?)', i['disc_id'],i['name'],i['date'])
-        for j in u['roles']: #access roles
+        current_user_id = cur.lastrowid
+        for j in i['roles']: #NOTE: access roles (a huge list... of lists, each individual role being in a self-contained list. due to zip.
             for z in j: #access the roles individually
-                cur.execute('INSERT INTO UserRoles (role_name) VALUES (?)', i['roles'])
+                current_role_id = role_dict.get(z) #using get so it returns None, instead of crashing if z is not in there.
+                cur.execute('INSERT INTO UserRoles (user_id, role_id, role_name) VALUES (?,?,?)', current_user_id,current_role_id,i['roles'])
                 
-
+'''CURRENT ISSUES:
+        for i in u, this makes i = "Username", so I will not be able to access anything else. I MUST redit this to look at values, because I forgot how dictionaries work somehow lol
+        In roles, '''
 
 
                 
