@@ -49,23 +49,41 @@ def populate(u, r):
     role_dict = {}
     con = sqlite3.connect('IFA.db')
     cur = con.cursor()
-    for m in r: #accesses for roles FIXME: MAKE THIS ITERATE ROLES.VALUES()
-        cur.execute('INSERT INTO Roles (role_name, role_type) VALUES (?,?)', m['role_name'],m['type'])
+    for m in r.values(): #accesses for roles 
+        cur.execute('INSERT INTO Roles (role_name, role_type) VALUES (?,?)', (m['role_name'],m['type']))
         role_id = cur.lastrowid
         role_dict.update({m['role_name']: role_id})
-    for i in u:
+    for i in u.values():
         #accessed the first part of the dict of Users
-        cur.execute('INSERT INTO Users (discord_id, username, date_joined) VALUES (?, ?, ?)', i['disc_id'],i['name'],i['date'])
+        cur.execute('INSERT INTO Users (discord_id, username, date_joined) VALUES (?, ?, ?)', (i['disc_id'],i['name'],i['date']))
         current_user_id = cur.lastrowid
         for j in i['roles']: #NOTE: access roles (a huge list... of lists, each individual role being in a self-contained list. due to zip.
             for z in j: #access the roles individually
                 current_role_id = role_dict.get(z) #using get so it returns None, instead of crashing if z is not in there.
-                cur.execute('INSERT INTO UserRoles (user_id, role_id, role_name) VALUES (?,?,?)', current_user_id,current_role_id,i['roles'])
-                
-'''CURRENT ISSUES:
-        for i in u, this makes i = "Username", so I will not be able to access anything else. I MUST redit this to look at values, because I forgot how dictionaries work somehow lol
-        In roles, '''
+                if current_role_id is not None:
+                    cur.execute('INSERT INTO UserRoles (user_id, role_id, role_name) VALUES (?,?,?)', (current_user_id,current_role_id,z))
+                else:
+                    print('ERROR: current_role_id not found!')
+
+    con.commit()
+    con.close()
 
 
-                
-                    
+'''
+NOTE TO SELF:
+    HELLO ME! NOTICE YOU HAD TO GET HELP WITH FIXING THESE ISSUES DUE TO HOW DICTS WORK.
+    WE CHANGED R TO R.VALUES() AS THEN WE WOULD BE ACCESSING STILL AN ENTIRE DICT AND HAD ISSUES WITH THAT.
+    DUE TO CHANGING IT TO R.VALUES R{} = {M}, WE ARE NOW ABLE TO CALL IT LIKE BEFORE, M[X], M[Z].
+
+    1. DICT:
+        FOR KEY IN DICT: ONLY GIVES THE KEYS OR NAMES OF THE ENTRY
+        FOR KEY IN DICT.VALUES GIVES US THE ACTUAL DATA. BECAUSE REMEMBER, WE FORMATTED IT AS {KEY{NAME, VALUE}}.
+
+    2. SQLITE:
+        WRAP VALUES SENT IN PARATHENSES BECAUSE THAT IS WHAT IS EXPECTED.
+    3. DICT LOOKUPS:
+        USE DICT[KEY] OR DICT.GET(KEY) , BECAUSE WHEN I TRIED .VALUES() OR .KEYS() WITHOUT FACT CHECKING, THEY RETURN
+        ALL VALUES OF SUCH.
+    
+    THESE ARE NOTES FOR ME TO REVIEW LATER, THEY WILL BE REMOVED.
+    '''
