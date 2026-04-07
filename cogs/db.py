@@ -87,3 +87,19 @@ NOTE TO SELF:
     
     THESE ARE NOTES FOR ME TO REVIEW LATER, THEY WILL BE REMOVED.
     '''
+
+'''
+    NOTE FOR TESTING:
+    do these for testing before moving onto google spreadsheets:
+    1. count check, if 3 users, make sure its only 3. same with roles.
+    
+    2. link test, check a user and see if their things are actually linked.
+        select Users.username, Roles.role_name from UserRoles JOIN Users ON UserRoles.user_id = Users.user_id
+        JOIN Roles ON UserRoles.role_id = Roles.role_id WHERE Users.username = 'plingplong'
+         MUST RETURN SOMETHING LIKE BCT OR ZEUSY
+         
+    3. Ghost check, look for rows where role_id is null or user_id is null in UserRoles, just in case.
+    
+    4. Print the entire tables.
+    
+    Then we move onto printing onto a spreadsheet!!!! :)) WE'RE HALFWAY THERE WOOOOHOOOOO'''

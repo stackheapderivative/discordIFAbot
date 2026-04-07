@@ -54,7 +54,7 @@ class UserData(commands.Cog):
             self.discordIDarr.append([u.id]) #gets discord id
             self.dateJoinedArr.append([u.joined_at.strftime('%d-%m-%Y')]) #gets datetime of when user joined
             for r in ctx.guild.roles: #gets the roles of users
-                if r in u.roles and r.name != '@everyone' and r.name not in test_ignored:
+                if r in u.roles and r.name != '@everyone' and r.name not in test_ignored and r.name not in self.temp_rolesArr:
                     self.temp_rolesArr.append([r.name]) #temp is used to store temporarily for one user, store as list in roles.
             self.rolesArr.append([self.temp_rolesArr])
         # await ctx.send(f'TEST COMMAND:\nUSERS:{self.usernamesArr}\nID:{self.discordIDarr}\nJOINED:{self.dateJoinedArr}\nROLES:{self.rolesArr}\n')
