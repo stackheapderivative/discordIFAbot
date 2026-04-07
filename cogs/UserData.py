@@ -62,6 +62,7 @@ class UserData(commands.Cog):
         # testobj = list(zip(self.usernamesArr, self.rolesArr))
         # for i in testobj:
         #     await ctx.send(f'TEST: {i}')
+        
         self.organize_data()
 
     #Scheduled event for ingesting data and sending to the sql database.
@@ -72,10 +73,11 @@ class UserData(commands.Cog):
             self.discordIDarr.append([u.id]) #gets discord id
             self.dateJoinedArr.append([u.joined_at.strftime('%d-%m-%Y')]) #gets datetime of when user joined
             for r in ctx.guild.roles: #gets the roles of users
-                if r in u.roles and r.name != '@everyone' and r.name not in test_ignored:
+                if r in u.roles and r.name != '@everyone' and r.name not in test_ignored and r.name not in self.temp_rolesArr:
                     self.temp_rolesArr.append([r.name])
             self.rolesArr.append([self.temp_rolesArr])
-    
+        self.organize_data() #send data to db
+
     def organize_data(self):
         #loop for user information
         user_information = zip(self.usernamesArr, self.discordIDarr, self.dateJoinedArr, self.rolesArr)
@@ -101,7 +103,8 @@ class UserData(commands.Cog):
                     Roles.update({i:{'role_name':i,'type':6}})
         #FIXME: TEST ROLES
         print(Roles)
-        db.populate(Users,Roles) #sends data to sqlite3
+        #FIXME: UNCOMMENT WHEN READY TO SEND DATA TO SQLITE3
+        #db.populate(Users,Roles) #sends data to sqlite3
 
 
 
