@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands, tasks
 from datetime import datetime, time
-#from db import populate
+from cogs.db import populate
 looptime = time(hour=0, minute=0) #lets us run the data ingestion every 24 hours.
 
 #arrays that are used to categorize roles:
@@ -37,6 +37,7 @@ class UserData(commands.Cog):
         self.dateJoinedArr = []
         self.rolesArr = []
         self.temp_rolesArr = []
+        self.temp_rolesArr_lib = []
         #date of today
         
 
@@ -57,6 +58,7 @@ class UserData(commands.Cog):
                 if r in u.roles and r.name != '@everyone' and r.name not in ignored and r.name not in self.temp_rolesArr:
                     self.temp_rolesArr.append([r.name]) #temp is used to store temporarily for one user, store as list in roles.
             self.rolesArr.append([self.temp_rolesArr])
+            self.temp_rolesArr_lib.extend(self.temp_rolesArr)
             self.temp_rolesArr = [] #clear array
         # await ctx.send(f'TEST COMMAND:\nUSERS:{self.usernamesArr}\nID:{self.discordIDarr}\nJOINED:{self.dateJoinedArr}\nROLES:{self.rolesArr}\n')
         #FIXME: TEST
@@ -77,6 +79,7 @@ class UserData(commands.Cog):
                 if r in u.roles and r.name != '@everyone' and r.name not in ignored and r.name not in self.temp_rolesArr:
                     self.temp_rolesArr.append([r.name])
             self.rolesArr.append([self.temp_rolesArr])
+            self.temp_rolesArr_lib.extend(self.temp_rolesArr)
             self.temp_rolesArr = [] #clear array
         self.organize_data() #send data to db
 
@@ -87,7 +90,7 @@ class UserData(commands.Cog):
             Users.update({i[0][0]:{'name':i[0][0],'disc_id':i[1][0],'date':i[2][0], 'roles':i[3][0]}})
         #FIXME: TEST USERS
         #print(Users)
-        for l in self.temp_rolesArr:
+        for l in self.temp_rolesArr_lib:
             for i in l:
                 if i in admin:
                     Roles.update({i:{'role_name':i,'type':0}})
@@ -104,9 +107,9 @@ class UserData(commands.Cog):
                 else:
                     Roles.update({i:{'role_name':i,'type':6}})
         #FIXME: TEST ROLES
-        #print(Roles)
+        # print(Roles)
         #FIXME: UNCOMMENT WHEN READY TO SEND DATA TO SQLITE3
-        #db.populate(Users,Roles) #sends data to sqlite3
+        populate(Users, Roles) #sends data to sqlite3
 
 
 

@@ -1,5 +1,5 @@
 import sqlite3
-from UserData import UserData
+
 
 '''
 DATA FORMATTING:
@@ -41,7 +41,7 @@ def operate_db():
                 )''')
     
 
-
+    
     con.commit()
     con.close()
 
@@ -50,22 +50,29 @@ def populate(u, r):
     con = sqlite3.connect('IFA.db')
     cur = con.cursor()
     for m in r.values(): #accesses for roles 
-        cur.execute('INSERT INTO Roles (role_name, role_type) VALUES (?,?)', (m['role_name'],m['type']))
+        cur.execute('INSERT OR REPLACE INTO Roles (role_name, role_type) VALUES (?,?)', (m['role_name'],m['type']))
         role_id = cur.lastrowid
         role_dict.update({m['role_name']: role_id})
     for i in u.values():
         #accessed the first part of the dict of Users
-        cur.execute('INSERT INTO Users (discord_id, username, date_joined) VALUES (?, ?, ?)', (i['disc_id'],i['name'],i['date']))
+        cur.execute('INSERT OR REPLACE INTO Users (discord_id, username, date_joined) VALUES (?, ?, ?)', (i['disc_id'],i['name'],i['date']))
         current_user_id = cur.lastrowid
         for j in i['roles']: #NOTE: access roles (a huge list... of lists, each individual role being in a self-contained list. due to zip.
             for z in j: #access the roles individually
                 current_role_id = role_dict.get(z) #using get so it returns None, instead of crashing if z is not in there.
                 if current_role_id is not None:
-                    cur.execute('INSERT INTO UserRoles (user_id, role_id, role_name) VALUES (?,?,?)', (current_user_id,current_role_id,z))
+                    cur.execute('INSERT OR REPLACE INTO UserRoles (user_id, role_id, role_name) VALUES (?,?,?)', (current_user_id,current_role_id,z))
                 else:
-                    print('ERROR: current_role_id not found!')
+                    print(f'ERROR: current_role_id not found! {current_role_id}')
+                    print(f'{z} vs {role_dict.get(z)}')
 
     con.commit()
+
+
+    #test
+    cur.execute('SELECT * From Users')
+    cur.execute('SELECT * From Roles')
+    cur.execute('SELECT * From UserRoles')
     con.close()
 
 

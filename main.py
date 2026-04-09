@@ -2,7 +2,8 @@ import discord
 import os
 from dotenv import load_dotenv
 from discord.ext import commands, tasks
-from cogs.UserData import UserData #cog for handling user data
+# from cogs.UserData import UserData #cog for handling user data
+from cogs.db import operate_db
 
 '''
 Client class:
@@ -26,3 +27,4 @@ if __name__ == "__main__":
     load_dotenv() #get token
     token = os.getenv('TOKEN')
     client.run(token)
+    operate_db()
