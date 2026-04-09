@@ -16,8 +16,7 @@ def operate_db():
     #create user table
     cur.execute('''
                 CREATE TABLE IF NOT EXISTS Users (
-                user_id INT AUTO_INCREMENT PRIMARY KEY,
-                discord_id BIGINT UNSIGNED NOT NULL UNIQUE,
+                discord_id BIGINT UNSIGNED NOT NULL UNIQUE PRIMARY KEY,
                 username VARCHAR(100) NOT NULL,
                 date_joined DATE NOT NULL
                 )
@@ -32,11 +31,11 @@ def operate_db():
     #creates UserRoles table
     cur.execute('''
                 CREATE TABLE IF NOT EXISTS UserRoles(
-                user_id INT AUTO_INCREMENT,
-                role_id int AUTO_INCREMENT,
+                discord_id BIGINT UNSIGNED NOT NULL,
+                role_id int NOT NULL,
                 role_name VARCHAR(100) NOT NULL,
-                PRIMARY KEY(user_id, role_id),
-                FOREIGN KEY (user_id) references Users(user_id),
+                PRIMARY KEY(discord_id, role_id),
+                FOREIGN KEY (discord_id) references Users(discord_id),
                 FOREIGN KEY (role_id) references Roles(role_id)
                 )''')
     
@@ -56,23 +55,16 @@ def populate(u, r):
     for i in u.values():
         #accessed the first part of the dict of Users
         cur.execute('INSERT OR REPLACE INTO Users (discord_id, username, date_joined) VALUES (?, ?, ?)', (i['disc_id'],i['name'],i['date']))
-        current_user_id = cur.lastrowid
         for j in i['roles']: #NOTE: access roles (a huge list... of lists, each individual role being in a self-contained list. due to zip.
             for z in j: #access the roles individually
                 current_role_id = role_dict.get(z) #using get so it returns None, instead of crashing if z is not in there.
                 if current_role_id is not None:
-                    cur.execute('INSERT OR REPLACE INTO UserRoles (user_id, role_id, role_name) VALUES (?,?,?)', (current_user_id,current_role_id,z))
+                    cur.execute('INSERT OR REPLACE INTO UserRoles (discord_id, role_id, role_name) VALUES (?,?,?)', (i['disc_id'],current_role_id,z))
                 else:
                     print(f'ERROR: current_role_id not found! {current_role_id}')
                     print(f'{z} vs {role_dict.get(z)}')
 
     con.commit()
-
-
-    #test
-    cur.execute('SELECT * From Users')
-    cur.execute('SELECT * From Roles')
-    cur.execute('SELECT * From UserRoles')
     con.close()
 
 
