@@ -1,12 +1,12 @@
 import discord
 from discord.ext import commands, tasks
 from datetime import datetime, time
-import db
+#from db import populate
 looptime = time(hour=0, minute=0) #lets us run the data ingestion every 24 hours.
 
 #arrays that are used to categorize roles:
-admin = ['Inquisitor','Lexmechanicus (mod team)','Enforcer Primaris','Leadership','Enforcer']
-leadership = ['Mission Department Lead','Interrogator','Enforcer Primaris','Inquisitor','Leadership','Team Leader','Tech priest']
+admin = ['Inquisitor','Lexmechanicus (mod team)','Enforcer Primaris','Enforcer']
+leadership = ['Mission Department Lead','Interrogator','Leadership','Team Leader','Tech priest']
 detachment = ['Defiance (Armor)','Vengeance (Air)','Harlequin (Actor)', 'Medicae', 'Zeal squad', 'Redemption Squad']
 rank = ['Team Leader', 'Squad Leader', 'Trooper', 'Scion', 'Schola', 'Scion', 'Acolyte', 'Agent','Reserves']
 department = ['Zeus', 'Archivist','Eden','Enginseer','Harlequin (Actor)']
@@ -54,9 +54,10 @@ class UserData(commands.Cog):
             self.discordIDarr.append([u.id]) #gets discord id
             self.dateJoinedArr.append([u.joined_at.strftime('%d-%m-%Y')]) #gets datetime of when user joined
             for r in ctx.guild.roles: #gets the roles of users
-                if r in u.roles and r.name != '@everyone' and r.name not in test_ignored and r.name not in self.temp_rolesArr:
+                if r in u.roles and r.name != '@everyone' and r.name not in ignored and r.name not in self.temp_rolesArr:
                     self.temp_rolesArr.append([r.name]) #temp is used to store temporarily for one user, store as list in roles.
             self.rolesArr.append([self.temp_rolesArr])
+            self.temp_rolesArr = [] #clear array
         # await ctx.send(f'TEST COMMAND:\nUSERS:{self.usernamesArr}\nID:{self.discordIDarr}\nJOINED:{self.dateJoinedArr}\nROLES:{self.rolesArr}\n')
         #FIXME: TEST
         # testobj = list(zip(self.usernamesArr, self.rolesArr))
@@ -73,9 +74,10 @@ class UserData(commands.Cog):
             self.discordIDarr.append([u.id]) #gets discord id
             self.dateJoinedArr.append([u.joined_at.strftime('%d-%m-%Y')]) #gets datetime of when user joined
             for r in ctx.guild.roles: #gets the roles of users
-                if r in u.roles and r.name != '@everyone' and r.name not in test_ignored and r.name not in self.temp_rolesArr:
+                if r in u.roles and r.name != '@everyone' and r.name not in ignored and r.name not in self.temp_rolesArr:
                     self.temp_rolesArr.append([r.name])
             self.rolesArr.append([self.temp_rolesArr])
+            self.temp_rolesArr = [] #clear array
         self.organize_data() #send data to db
 
     def organize_data(self):
@@ -84,25 +86,25 @@ class UserData(commands.Cog):
         for i in user_information:
             Users.update({i[0][0]:{'name':i[0][0],'disc_id':i[1][0],'date':i[2][0], 'roles':i[3][0]}})
         #FIXME: TEST USERS
-        print(Users)
+        #print(Users)
         for l in self.temp_rolesArr:
             for i in l:
-                if i in test_admin:
+                if i in admin:
                     Roles.update({i:{'role_name':i,'type':0}})
-                elif i in test_leadership:
+                elif i in leadership:
                     Roles.update({i:{'role_name':i,'type':1}})
-                elif i in test_detachment:
+                elif i in detachment:
                     Roles.update({i:{'role_name':i,'type':2}})
-                elif i in test_rank:
+                elif i in rank:
                     Roles.update({i:{'role_name':i,'type':3}})
-                elif i in test_department:
+                elif i in department:
                     Roles.update({i:{'role_name':i,'type':4}})
-                elif i in test_qualifications:
+                elif i in qualifications:
                     Roles.update({i:{'role_name':i,'type':5}})
                 else:
                     Roles.update({i:{'role_name':i,'type':6}})
         #FIXME: TEST ROLES
-        print(Roles)
+        #print(Roles)
         #FIXME: UNCOMMENT WHEN READY TO SEND DATA TO SQLITE3
         #db.populate(Users,Roles) #sends data to sqlite3
 
