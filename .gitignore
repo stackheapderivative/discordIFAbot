@@ -3,3 +3,4 @@ credentials.json
 token.json
 IFA.db
 __pycache__
+cogs/__pycache__
