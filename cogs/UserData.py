@@ -15,16 +15,6 @@ misc = []
 ignored = ['\\\\\\ Other Duties and Titles >>>','<<< Other Game Interests ///', '///Quals>>>', 'new role', '<<< Rank & Detachment ///','Reaction Roles']
 
 
-#NOTE: DUMMY ARRAYS
-test_admin = ['Not inquisitor']
-test_leadership = ['Blundership']
-test_detachment = ['Zeal?!??!']
-test_rank = ['Schola','Silly']
-test_department = ['Zeusy','Edener']
-test_qualifications = ['BCT','Demo','Medical','Vox']
-test_misc = []
-test_ignored = ['<<< Rank & Detachment ///','<<< Other Game Interests ///','\\\\\\ Other Duties and Titles >>>','///Quals >>>','John The Servitor']
-
 #dictionaries for data organization
 Users = {}
 Roles = {}
@@ -60,11 +50,7 @@ class UserData(commands.Cog):
             self.rolesArr.append([self.temp_rolesArr])
             self.temp_rolesArr_lib.extend(self.temp_rolesArr)
             self.temp_rolesArr = [] #clear array
-        # await ctx.send(f'TEST COMMAND:\nUSERS:{self.usernamesArr}\nID:{self.discordIDarr}\nJOINED:{self.dateJoinedArr}\nROLES:{self.rolesArr}\n')
-        #FIXME: TEST
-        # testobj = list(zip(self.usernamesArr, self.rolesArr))
-        # for i in testobj:
-        #     await ctx.send(f'TEST: {i}')
+
         
         self.organize_data()
 
@@ -88,8 +74,6 @@ class UserData(commands.Cog):
         user_information = zip(self.usernamesArr, self.discordIDarr, self.dateJoinedArr, self.rolesArr)
         for i in user_information:
             Users.update({i[0][0]:{'name':i[0][0],'disc_id':i[1][0],'date':i[2][0], 'roles':i[3][0]}})
-        #FIXME: TEST USERS
-        #print(Users)
         for l in self.temp_rolesArr_lib:
             for i in l:
                 if i in admin:
@@ -106,9 +90,6 @@ class UserData(commands.Cog):
                     Roles.update({i:{'role_name':i,'type':5}})
                 else:
                     Roles.update({i:{'role_name':i,'type':6}})
-        #FIXME: TEST ROLES
-        # print(Roles)
-        #FIXME: UNCOMMENT WHEN READY TO SEND DATA TO SQLITE3
         populate(Users, Roles) #sends data to sqlite3
 
 
